@@ -46,7 +46,17 @@ section{padding:84px 0}
 .pic{aspect-ratio:4/5;border-radius:120px 120px 14px 14px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:22%;position:relative;overflow:hidden}
 .pic i{display:block;width:44%;height:36%;border-radius:8px 8px 14px 14px;background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 2px rgba(255,255,255,.5),0 14px 24px rgba(0,0,0,.18);position:relative}
 .pic i::after{content:"";position:absolute;left:50%;top:-14px;width:12px;height:18px;margin-left:-6px;background:radial-gradient(#fff6d0,#f0a33a);border-radius:50% 50% 50% 50%/65% 65% 35% 35%;animation:flick 2.8s ease-in-out infinite}
-.pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* .pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover} */
+.pic img{flex:0 0 100%;width:100%;height:100%;scroll-snap-align:center;object-fit:cover}
+.gal{position:absolute;inset:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.gal::-webkit-scrollbar{display:none}
+.gn{position:absolute;top:50%;width:34px;height:34px;margin-top:-17px;border:0;border-radius:50%;background:rgba(255,248,234,.88);color:#4b5a2b;font-size:22px;line-height:1;cursor:pointer;z-index:2}
+.gp{left:8px}.gx{right:8px}
+.dots{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:2}
+.dots b{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.6)}
+.dots b.on{background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.3)}
+
 .add:disabled{opacity:.5;cursor:default}
 .item h3{font-size:26px;margin:16px 0 2px}
 .item small{color:var(--mute)}
@@ -96,7 +106,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 </div></header>
 
 <section id="shop"><div class="wrap">
-<div class="head"><h2>The collection</h2><p>Six scents, each poured by hand in small batches.</p></div>
+<div class="head"><h2>The collection</h2><p>Scented Candles, each poured by hand in small batches.</p></div>
 <div class="grid" id="products"></div>
 </div></section>
 
@@ -145,8 +155,10 @@ const firebaseConfig={
   storageBucket: "auravine-backend.firebasestorage.app",
   messagingSenderId: "949943989995",
   appId: "1:949943989995:web:a51be2a7e4d736b92ab0ae"};
-// ==========================================================
-function showProducts(){$("#products").innerHTML=PRODUCTS.length?PRODUCTS.map(p=>`<div class="item"><div class="pic" style="background:linear-gradient(180deg,${p.c||"#e8dcb0"},#f3ead2)">${p.img?`<img src="${p.img}" alt="${p.name}" loading="lazy">`:"<i></i>"}</div><h3>${p.name}</h3><small>${p.note||""}</small><div class="row"><span class="price">₹${p.price}</span><button class="add" data-id="${p.id}" ${p.soldOut?"disabled":""}>${p.soldOut?"Sold out":"Add to cart"}</button></div></div>`).join(""):"<p>New candles coming soon.</p>"}
+// ==========================================================/
+function showProducts(){$("#products").innerHTML=PRODUCTS.length?PRODUCTS.map(p=>{const im=p.imgs&&p.imgs.length?p.imgs:(p.img?[p.img]:[]);return `<div class="item"><div class="pic" style="background:linear-gradient(180deg,${p.c||"#e8dcb0"},#f3ead2)">${im.length?`<div class="gal">${im.map(s=>`<img src="${s}" alt="${p.name}" loading="lazy" style="object-fit:${p.fit||"cover"}">`).join("")}</div>${im.length>1?`<button class="gn gp" data-g="-1" aria-label="Previous photo">‹</button><button class="gn gx" data-g="1" aria-label="Next photo">›</button><div class="dots">${im.map((_,i)=>`<b${i?"":' class="on"'}></b>`).join("")}</div>`:""}`:"<i></i>"}</div><h3>${p.name}</h3><small>${p.note||""}</small><div class="row"><span class="price">₹${p.price}</span><button class="add" data-id="${p.id}" ${p.soldOut?"disabled":""}>${p.soldOut?"Sold out":"Add to cart"}</button></div></div>`}).join(""):"<p>New candles coming soon.</p>"}
+document.addEventListener("click",e=>{const b=e.target.closest(".gn");if(!b)return;const g=b.parentElement.querySelector(".gal");g.scrollBy({left:g.clientWidth*b.dataset.g,behavior:"smooth"})});
+document.addEventListener("scroll",e=>{const g=e.target;if(!g.classList||!g.classList.contains("gal"))return;const i=Math.round(g.scrollLeft/g.clientWidth);g.parentElement.querySelectorAll(".dots b").forEach((d,k)=>d.classList.toggle("on",k==i))},true);
 getDocs(query(collection(getFirestore(initializeApp(firebaseConfig)),"products"),orderBy("created"))).then(s=>{PRODUCTS=s.docs.map(d=>({id:d.id,...d.data()}));showProducts()}).catch(()=>showProducts());
 function render(){
 const ids=Object.keys(cart);let n=0,t=0;
