@@ -19,16 +19,12 @@ small.h{display:block;color:#6b7258;margin:-6px 0 12px}
 .th{position:relative}.th img{width:84px;height:105px;object-fit:cover;border-radius:10px;display:block}
 .th button{position:absolute;top:-6px;right:-6px;width:24px;height:24px;padding:0;border-radius:50%;background:#b3261e;font-size:16px;line-height:1}
 .row{display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid #e6dcc0}
-.row img,.row .ph{width:64px;height:64px;border-radius:10px;object-fit:cover;background:#e8dcb0;flex:none}
+.row>img,.row .ph{width:64px;height:64px;border-radius:10px;object-fit:cover;background:#e8dcb0;flex:none}
 .row div.t{flex:1;min-width:0}.row small{color:#6b7258}
+.rimgs{display:flex;gap:6px;margin-top:8px}.rimgs img{width:64px;height:64px;object-fit:cover;border-radius:8px}
 .acts{display:flex;gap:6px;flex-wrap:wrap}
-.tag{background:#b3261e;color:#fff;border-radius:6px;font-size:11px;padding:1px 7px;margin-left:6px}
+.tag{color:#fff;border-radius:6px;font-size:11px;padding:1px 7px;margin-left:6px;background:#b3261e}
 #err{color:#b3261e}
-[hidden]{display:none!important}
-textarea{display:block;width:100%;padding:11px;margin-bottom:12px;border:1px solid #cbbf9c;border-radius:8px;font:inherit;background:#fff}
-.tabs{display:flex;gap:8px;justify-content:center;padding:14px 22px 0}
-.tabs button.on{background:#4b5a2b;color:#fff}
-.lnk{display:inline-block;background:#25a244;color:#fff;padding:10px 20px;border-radius:99px;text-decoration:none;font-weight:600}
 </style></head><body>
 
 <div id="login" class="card">
@@ -40,8 +36,7 @@ textarea{display:block;width:100%;padding:11px;margin-bottom:12px;border:1px sol
 
 <div id="app" hidden>
 <header><b>Auravine Admin</b><button class="s" id="out" style="color:#f3ead2;border-color:#8b9468">Logout</button></header>
-<nav class="tabs"><button class="s on" data-t="pr">Products</button><button class="s" data-t="rv">Reviews</button></nav>
-<main id="pr">
+<main>
 <form id="f" class="card">
 <h2 id="ft">Add new product</h2>
 <input id="name" placeholder="Product name" required>
@@ -56,45 +51,28 @@ textarea{display:block;width:100%;padding:11px;margin-bottom:12px;border:1px sol
 <button type="button" class="s" id="cancel" hidden>Cancel edit</button>
 </form>
 <div class="card"><h2>Your products</h2><div id="list">Loading...</div></div>
-</main>
-<main id="rv" hidden>
-<form id="rq" class="card"><h2>Request a review</h2>
-<input id="rqn" placeholder="Customer's first name" required>
-<input id="rqp" placeholder="Product they bought">
-<button>Create review link</button>
-<textarea id="out2" hidden readonly rows="5"></textarea>
-<a id="wa" class="lnk" hidden target="_blank" rel="noopener">Open in WhatsApp</a>
-</form>
-<div class="card"><h2>Review requests</h2><div id="clist">Loading...</div></div>
-<div class="card"><h2>Reviews</h2><div id="rlist">Loading...</div></div>
-<form id="mf" class="card"><h2>Add a review manually</h2>
-<small class="h">For feedback received on WhatsApp. Keep the chat screenshot as proof of permission.</small>
-<input id="mn" placeholder="Customer's first name" required>
-<input id="mc" placeholder="City (optional)">
-<input id="mp" placeholder="Product">
-<select id="mr"><option value="5">5 stars</option><option value="4">4 stars</option><option value="3">3 stars</option><option value="2">2 stars</option><option value="1">1 star</option></select>
-<textarea id="mt" rows="3" placeholder="Their feedback" required></textarea>
-<label>Photo (optional)</label><input id="mfile" type="file" accept="image/*">
-<label><input id="mok" type="checkbox" required style="display:inline;width:auto;margin-right:8px">The customer gave permission to show this on the website</label><br><br>
-<button id="msave">Add review</button>
-</form>
+
 <div class="card"><h2>Customer reviews</h2><div id="rlist">Loading...</div></div>
 <form id="rf" class="card"><h2>Add a review manually</h2>
-<small class="h">Only add real reviews your customers sent you (WhatsApp, Instagram), with their permission.</small>
-<input id="rn" placeholder="Customer name" required>
+<small class="h">Only add real reviews your customers sent you (WhatsApp, Instagram). Keep the chat screenshot as proof of permission.</small>
+<input id="rn" placeholder="Customer's first name" required>
 <input id="rc" placeholder="City (optional)">
 <input id="rp" placeholder="Product (optional)">
 <select id="rr"><option value="5">5 stars</option><option value="4">4 stars</option><option value="3">3 stars</option><option value="2">2 stars</option><option value="1">1 star</option></select>
-<textarea id="rt" rows="3" placeholder="Review text" required minlength="10" maxlength="600"></textarea>
+<textarea id="rt" rows="3" placeholder="Their feedback" required minlength="10" maxlength="600"></textarea>
+<label>Photos (optional, up to 2)</label>
+<input id="rfile" type="file" accept="image/*" multiple>
+<small class="h" id="rcount"></small>
+<label><input id="rok" type="checkbox" required style="display:inline;width:auto;margin-right:8px">The customer gave permission to show this on the website</label><br><br>
 <button>Add review</button></form>
 </main></div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import {getFirestore,collection,getDocs,addDoc,updateDoc,deleteDoc,deleteField,setDoc,doc,query,orderBy} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import {getFirestore,collection,getDocs,addDoc,updateDoc,deleteDoc,deleteField,doc,query,orderBy} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-// ====== PASTE YOUR FIREBASE CONFIG HERE ======
+// ====== FIREBASE CONFIG ======
 const firebaseConfig={
   apiKey: "AIzaSyD3Tlnouh_z7ZLAkolX-aIxqIwHZeGXdV4",
   authDomain: "auravine-backend.firebaseapp.com",
@@ -103,23 +81,29 @@ const firebaseConfig={
   messagingSenderId: "949943989995",
   appId: "1:949943989995:web:a51be2a7e4d736b92ab0ae"
 };
-// =============================================
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),col=collection(db,"products");
-const ref=id=>doc(db,"products",id);
+// =============================
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+const pcol=collection(db,"products"),rcol=collection(db,"reviews");
+const pref=id=>doc(db,"products",id),rref=id=>doc(db,"reviews",id);
 const $=s=>document.querySelector(s);
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const MAX=4;
-let items=[],editId=null,imgs=[];
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shrink=(f,max,q)=>new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{
+  const w=Math.min(max,im.width),h=im.height*w/im.width,c=document.createElement("canvas");
+  c.width=w;c.height=h;const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);
+  res(c.toDataURL("image/jpeg",q))};im.src=r.result};r.readAsDataURL(f)});
 
 onAuthStateChanged(auth,u=>{$("#login").hidden=!!u;$("#app").hidden=!u;if(u){load();loadReviews()}});
 $("#in").onclick=()=>signInWithEmailAndPassword(auth,$("#em").value,$("#pw").value).catch(()=>$("#err").textContent="Wrong email or password");
 $("#out").onclick=()=>signOut(auth);
 
+/* ---------- Products ---------- */
+const MAX=4;
+let items=[],editId=null,imgs=[];
+const photos=p=>p.imgs&&p.imgs.length?p.imgs:(p.img?[p.img]:[]);
 async function load(){
-  try{const s=await getDocs(query(col,orderBy("created")));items=s.docs.map(d=>({id:d.id,...d.data()}));draw()}
+  try{const s=await getDocs(query(pcol,orderBy("created")));items=s.docs.map(d=>({id:d.id,...d.data()}));draw()}
   catch(e){$("#list").textContent="Could not load: "+e.message}
 }
-const photos=p=>p.imgs&&p.imgs.length?p.imgs:(p.img?[p.img]:[]);
 function draw(){
   $("#list").innerHTML=items.length?items.map(p=>{const a=photos(p);return `<div class="row">
   ${a[0]?`<img src="${a[0]}" alt="">`:`<div class="ph"></div>`}
@@ -128,107 +112,45 @@ function draw(){
   <button class="s" data-a="sold" data-i="${p.id}">${p.soldOut?"Mark in stock":"Mark sold out"}</button>
   <button class="d" data-a="del" data-i="${p.id}">Delete</button></div></div>`}).join(""):"No products yet. Add your first one above.";
 }
-
 function thumbs(){$("#thumbs").innerHTML=imgs.map((s,i)=>`<span class="th"><img src="${s}" alt=""><button type="button" data-x="${i}" aria-label="Remove photo">×</button></span>`).join("")}
 $("#thumbs").onclick=e=>{const b=e.target.closest("button");if(b){imgs.splice(+b.dataset.x,1);thumbs()}};
-const shrink=f=>new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{
-  const w=Math.min(700,im.width),h=im.height*w/im.width,c=document.createElement("canvas");
-  c.width=w;c.height=h;const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);
-  res(c.toDataURL("image/jpeg",.75))};im.src=r.result};r.readAsDataURL(f)});
 $("#file").onchange=async e=>{
-  for(const f of e.target.files){if(imgs.length>=MAX){alert("Maximum "+MAX+" photos per product");break}imgs.push(await shrink(f))}
+  for(const f of e.target.files){if(imgs.length>=MAX){alert("Maximum "+MAX+" photos per product");break}imgs.push(await shrink(f,700,.75))}
   e.target.value="";thumbs();
 };
 function reset(){editId=null;imgs=[];$("#f").reset();thumbs();$("#ft").textContent="Add new product";$("#cancel").hidden=true}
 $("#cancel").onclick=reset;
-
 $("#f").onsubmit=async e=>{
   e.preventDefault();
   const d={name:$("#name").value.trim(),note:$("#note").value.trim(),price:+$("#price").value,fit:$("#fit").value,imgs};
   if(JSON.stringify(imgs).length>900000){alert("Photos are too large together. Remove one photo.");return}
   const b=$("#save");b.disabled=true;
   try{
-    if(editId)await updateDoc(ref(editId),{...d,img:deleteField()});else await addDoc(col,{...d,soldOut:false,created:Date.now()});
+    if(editId)await updateDoc(pref(editId),{...d,img:deleteField()});else await addDoc(pcol,{...d,soldOut:false,created:Date.now()});
     reset();await load();
   }catch(x){alert("Save failed: "+x.message)}
   b.disabled=false;
 };
-
 $("#list").onclick=async e=>{
   const b=e.target.closest("button");if(!b)return;
   const p=items.find(x=>x.id==b.dataset.i);if(!p)return;
   try{
-    if(b.dataset.a=="del"&&confirm(`Delete "${p.name}"?`)){await deleteDoc(ref(p.id));await load()}
-    if(b.dataset.a=="sold"){await updateDoc(ref(p.id),{soldOut:!p.soldOut});await load()}
+    if(b.dataset.a=="del"&&confirm(`Delete "${p.name}"?`)){await deleteDoc(pref(p.id));await load()}
+    if(b.dataset.a=="sold"){await updateDoc(pref(p.id),{soldOut:!p.soldOut});await load()}
     if(b.dataset.a=="edit"){editId=p.id;imgs=[...photos(p)];thumbs();$("#name").value=p.name;$("#note").value=p.note||"";$("#price").value=p.price;
       $("#fit").value=p.fit||"cover";$("#ft").textContent="Edit product";$("#cancel").hidden=false;scrollTo({top:0,behavior:"smooth"})}
   }catch(x){alert("Failed: "+x.message)}
 };
 
-// ===== Reviews =====
-const rcol=collection(db,"reviews"),ccol=collection(db,"reviewCodes");
-let revs=[],codes=[],mImg="";
-document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
-  document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x==b));
-  $("#pr").hidden=b.dataset.t!="pr";$("#rv").hidden=b.dataset.t!="rv";if(b.dataset.t=="rv")loadRev();
-});
-const stars=n=>"★".repeat(n)+"☆".repeat(5-n);
-const link=c=>location.origin+location.pathname.replace(/[^/]*$/,"")+"review.html?c="+c;
-const msg=r=>`Namaste ${r.name}! 🕯️ Aapka Auravine ${r.product||"candle"} mil gaya hoga. Kaisa laga? 30 second mein apna feedback yahan share kijiye: ${link(r.id)}\nAapka review hamare liye bahut kaam aata hai. Dhanyavaad! 🙏`;
-async function loadRev(){
-  try{
-    const [a,c]=await Promise.all([getDocs(query(rcol,orderBy("created","desc"))),getDocs(query(ccol,orderBy("created","desc")))]);
-    revs=a.docs.map(d=>({id:d.id,...d.data()}));codes=c.docs.map(d=>({id:d.id,...d.data()}));drawRev();
-  }catch(e){$("#rlist").textContent="Could not load: "+e.message}
-}
-function drawRev(){
-  $("#rlist").innerHTML=revs.length?revs.map(r=>`<div class="row">${r.imgs&&r.imgs[0]?`<img src="${r.imgs[0]}" alt="">`:`<div class="ph"></div>`}
-  <div class="t"><b>${esc(r.name)}</b>${r.city?", "+esc(r.city):""} <span style="color:#e8a33d">${stars(r.rating)}</span>${r.approved?"":'<span class="tag">Pending</span>'}<br><small>${esc(r.product||"")} · ${r.source=="manual"?"added manually":"via link"}</small><br>${esc(r.text)}</div>
-  <div class="acts"><button class="s" data-r="tog" data-i="${r.id}">${r.approved?"Hide":"Approve"}</button><button class="d" data-r="del" data-i="${r.id}">Delete</button></div></div>`).join(""):"No reviews yet.";
-  $("#clist").innerHTML=codes.length?codes.map(c=>{const done=revs.some(r=>r.id==c.id);return `<div class="row"><div class="t"><b>${esc(c.name)}</b> · ${esc(c.product||"")}<br><small>${c.id} · ${done?"Review received ✓":"Waiting for review"}</small></div><div class="acts">${done?"":`<button class="s" data-r="cp" data-i="${c.id}">Copy message</button>`}</div></div>`}).join(""):"No requests yet.";
-}
-$("#rlist").onclick=async e=>{
-  const b=e.target.closest("button");if(!b)return;const r=revs.find(x=>x.id==b.dataset.i);
-  try{
-    if(b.dataset.r=="tog")await updateDoc(doc(db,"reviews",r.id),{approved:!r.approved});
-    if(b.dataset.r=="del"&&confirm("Delete this review?"))await deleteDoc(doc(db,"reviews",r.id));
-    loadRev();
-  }catch(x){alert(x.message)}
-};
-$("#clist").onclick=async e=>{
-  const b=e.target.closest("button");if(!b)return;const c=codes.find(x=>x.id==b.dataset.i);
-  try{await navigator.clipboard.writeText(msg(c));b.textContent="Copied ✓"}catch{prompt("Copy this message:",msg(c))}
-};
-$("#rq").onsubmit=async e=>{
-  e.preventDefault();
-  const A="ABCDEFGHJKMNPQRSTUVWXYZ23456789";let c="AV-";
-  crypto.getRandomValues(new Uint8Array(6)).forEach(n=>c+=A[n%A.length]);
-  const r={id:c,name:$("#rqn").value.trim(),product:$("#rqp").value.trim()};
-  try{
-    await setDoc(doc(db,"reviewCodes",c),{name:r.name,product:r.product,created:Date.now()});
-    $("#rq").reset();$("#out2").value=msg(r);$("#out2").hidden=false;
-    $("#wa").href="https://wa.me/?text="+encodeURIComponent(msg(r));$("#wa").hidden=false;loadRev();
-  }catch(x){alert(x.message)}
-};
-$("#mfile").onchange=async e=>{const f=e.target.files[0];mImg=f?await shrink(f):""};
-$("#mf").onsubmit=async e=>{
-  e.preventDefault();const b=$("#msave");b.disabled=true;
-  try{
-    await addDoc(rcol,{name:$("#mn").value.trim(),city:$("#mc").value.trim(),rating:+$("#mr").value,text:$("#mt").value.trim(),product:$("#mp").value.trim(),imgs:mImg?[mImg]:[],consent:true,approved:true,source:"manual",created:Date.now()});
-    $("#mf").reset();mImg="";loadRev();
-  }catch(x){alert(x.message)}
-  b.disabled=false;
-};
-
-const rcol=collection(db,"reviews"),rref=id=>doc(db,"reviews",id);
-let revs=[];
+/* ---------- Reviews ---------- */
+let revs=[],rimgs=[];
 async function loadReviews(){
   try{const s=await getDocs(query(rcol,orderBy("created","desc")));revs=s.docs.map(d=>({id:d.id,...d.data()}));drawRev()}
   catch(e){$("#rlist").textContent="Could not load: "+e.message}
 }
 function drawRev(){
   const n=revs.filter(r=>!r.approved).length;
-  $("#rlist").innerHTML=revs.length?(n?`<p><b>${n} waiting for your approval</b></p>`:"")+revs.map(r=>`<div class="row"><div class="t"><b>${esc(r.name)}</b>${r.city?", "+esc(r.city):""} <span class="tag" style="background:${r.approved?"#4b5a2b":"#c27a00"}">${r.approved?"Live":"Pending"}</span><br>${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}<br><small>${esc(r.text)}</small>${r.imgs&&r.imgs.length?`<div style="display:flex;gap:6px;margin-top:8px">${r.imgs.map(s=>`<img src="${s}" alt="">`).join("")}</div>`:""}</div><div class="acts"><button class="s" data-r="ok" data-i="${r.id}">${r.approved?"Hide":"Approve"}</button><button class="d" data-r="del" data-i="${r.id}">Delete</button></div></div>`).join(""):"No reviews yet.";
+  $("#rlist").innerHTML=revs.length?(n?`<p><b>${n} waiting for your approval</b></p>`:"")+revs.map(r=>`<div class="row"><div class="t"><b>${esc(r.name)}</b>${r.city?", "+esc(r.city):""} <span class="tag" style="background:${r.approved?"#4b5a2b":"#c27a00"}">${r.approved?"Live":"Pending"}</span><br>${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}<br><small>${esc(r.text)}</small>${r.imgs&&r.imgs.length?`<div class="rimgs">${r.imgs.map(s=>`<img src="${s}" alt="">`).join("")}</div>`:""}</div><div class="acts"><button class="s" data-r="ok" data-i="${r.id}">${r.approved?"Hide":"Approve"}</button><button class="d" data-r="del" data-i="${r.id}">Delete</button></div></div>`).join(""):"No reviews yet.";
 }
 $("#rlist").onclick=async e=>{
   const b=e.target.closest("button");if(!b)return;
@@ -238,11 +160,17 @@ $("#rlist").onclick=async e=>{
     if(b.dataset.r=="del"&&confirm("Delete this review?")){await deleteDoc(rref(r.id));await loadReviews()}
   }catch(x){alert("Failed: "+x.message)}
 };
+$("#rfile").onchange=async e=>{
+  for(const f of e.target.files){if(rimgs.length>=2){alert("Maximum 2 photos per review");break}rimgs.push(await shrink(f,640,.7))}
+  e.target.value="";$("#rcount").textContent=rimgs.length?rimgs.length+" photo(s) added":"";
+};
 $("#rf").onsubmit=async e=>{
   e.preventDefault();
   try{
-    await addDoc(rcol,{name:$("#rn").value.trim(),city:$("#rc").value.trim(),product:$("#rp").value.trim(),rating:+$("#rr").value,text:$("#rt").value.trim(),approved:true,created:Date.now()});
-    $("#rf").reset();await loadReviews();
+    const d={name:$("#rn").value.trim(),city:$("#rc").value.trim(),product:$("#rp").value.trim(),rating:+$("#rr").value,text:$("#rt").value.trim(),approved:true,created:Date.now()};
+    if(rimgs.length)d.imgs=rimgs;
+    await addDoc(rcol,d);
+    $("#rf").reset();rimgs=[];$("#rcount").textContent="";await loadReviews();
   }catch(x){alert("Save failed: "+x.message)}
 };
 </script></body></html>
