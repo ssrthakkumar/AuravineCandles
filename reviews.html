@@ -53,6 +53,9 @@ details{border-bottom:1px solid var(--line);padding:16px 0}summary{cursor:pointe
 .form input,.form textarea{width:100%;padding:11px;border:1px solid #cbbf9c;border-radius:8px;font:inherit;background:#fff}
 #rate{display:flex;gap:4px}#rate button{background:none;border:0;font-size:34px;line-height:1;color:#cdbf93;cursor:pointer;padding:0 2px}#rate button.on{color:var(--flame)}
 .hp{position:absolute;left:-9999px}
+.rp{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}.rp img{width:76px;height:76px;object-fit:cover;border-radius:10px;cursor:zoom-in;display:block}
+.th{position:relative}.th button{position:absolute;top:-6px;right:-6px;width:24px;height:24px;padding:0;border:0;border-radius:50%;background:#b3261e;color:#fff;font-size:16px;line-height:1;cursor:pointer}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.86);display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out;padding:20px}#lb.on{display:flex}#lb img{max-width:100%;max-height:100%;border-radius:12px}
 #msg{margin:14px 0 0;font-weight:600}
 .cta{text-align:center}.cta .head{margin:0 auto 10px}
 footer{background:var(--deep);color:#b9b99f;padding:34px 0;font-size:14px}footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
@@ -84,7 +87,7 @@ footer{background:var(--deep);color:#b9b99f;padding:34px 0;font-size:14px}footer
 <div class="grid3">
 <div class="why"><h3>Made by hand</h3><p>Each candle is poured, cured and finished by us, not mass produced.</p></div>
 <div class="why"><h3>Quality you can see</h3><p>Clean burn, even melt and a scent that fills the room softly.</p></div>
-<div class="why"><h3>Made your way</h3><p>Choose scent, colour and a personal message for gifts and occasions.</p></div>
+<div class="why"><h3>Made your way</h3><p>Choose scent, colour, size and a personal message for gifts and occasions.</p></div>
 <div class="why"><h3>Gift ready</h3><p>Neat packaging that is ready to give. Add a handwritten note on request.</p></div>
 <div class="why"><h3>Honest pricing</h3><p>Fair prices, no hidden charges. What you see is what you pay.</p></div>
 <div class="why"><h3>Real people</h3><p>Message us anytime. We answer questions and help you pick the right candle.</p></div>
@@ -95,13 +98,13 @@ footer{background:var(--deep);color:#b9b99f;padding:34px 0;font-size:14px}footer
 <div class="grid3">
 <div><h3>Order confirmed first</h3><p>We confirm every order on WhatsApp before you pay anything.</p></div>
 <div><h3>Careful packing</h3><p>Every parcel is wrapped to protect the candle in transit.</p></div>
-<!-- <div><h3>We fix problems</h3><p>If something is wrong with your order, tell us and we will make it right.</p></div> -->
+<div><h3>We fix problems</h3><p>If something is wrong with your order, tell us and we will make it right.</p></div>
 </div></div></section>
 
 <section><div class="wrap">
 <div class="head"><h2>Good to know</h2></div>
 <details><summary>How do I place an order?</summary><p>Add candles to your cart on our shop page and send the order to us on WhatsApp. We confirm it and share UPI payment details.</p></details>
-<details><summary>Can I customise a candle?</summary><p>Yes. Message us the scent, colour and any name or message you want, and we will confirm what is possible.</p></details>
+<details><summary>Can I customise a candle?</summary><p>Yes. Message us the scent, colour, size and any name or message you want, and we will confirm what is possible.</p></details>
 <details><summary>How do I get the best burn from my candle?</summary><p>Trim the wick to about 5 mm before each burn. On the first burn, let the wax melt all the way to the edge, which usually takes 2 to 3 hours. Keep it away from drafts and never leave it burning unattended.</p></details>
 <details><summary>Do you deliver across India?</summary><p>Yes, we ship across India. Share your pincode on WhatsApp and we will confirm delivery time and charges.</p></details>
 </div></section>
@@ -115,6 +118,7 @@ footer{background:var(--deep);color:#b9b99f;padding:34px 0;font-size:14px}footer
 <label>Your rating</label><div id="rate" role="radiogroup" aria-label="Rating">
 <button type="button" data-v="1" aria-label="1 star">★</button><button type="button" data-v="2" aria-label="2 stars">★</button><button type="button" data-v="3" aria-label="3 stars">★</button><button type="button" data-v="4" aria-label="4 stars">★</button><button type="button" data-v="5" aria-label="5 stars">★</button></div>
 <label for="tx">Your review</label><textarea id="tx" rows="4" minlength="10" maxlength="600" required placeholder="What did you love? How was the scent, burn and packing?"></textarea>
+<label for="ph">Add photos (optional, up to 2)</label><input type="file" id="ph" accept="image/*" multiple><div class="rp" id="thumbs" style="margin-top:10px"></div>
 <input class="hp" id="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
 <button class="btn" id="go" style="margin-top:18px">Submit review</button>
 <p id="msg" role="status"></p>
@@ -126,6 +130,7 @@ footer{background:var(--deep);color:#b9b99f;padding:34px 0;font-size:14px}footer
 
 <footer><div class="wrap"><span>© 2026 Auravine. Handcrafted candles.</span><a href="index.html">Back to shop</a></div></footer>
 
+<div id="lb"><img alt=""></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import {getFirestore,collection,getDocs,addDoc,query,where} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
@@ -141,6 +146,22 @@ const col=collection(getFirestore(initializeApp(firebaseConfig)),"reviews");
 const $=s=>document.querySelector(s);
 const esc=s=>String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const stars=n=>`<span class="st" role="img" aria-label="${n} out of 5 stars">${"★".repeat(n)}<i>${"★".repeat(5-n)}</i></span>`;
+const photosHtml=x=>x.imgs&&x.imgs.length?`<div class="rp">${x.imgs.map(s=>`<img src="${s}" alt="Photo from ${esc(x.name)}" data-zoom>`).join("")}</div>`:"";
+document.addEventListener("click",e=>{
+  const z=e.target.closest("[data-zoom]");if(z){$("#lb img").src=z.src;$("#lb").classList.add("on")}
+  else if(e.target.closest("#lb"))$("#lb").classList.remove("on");
+});
+let pics=[];
+const drawThumbs=()=>{$("#thumbs").innerHTML=pics.map((s,i)=>`<span class="th"><img src="${s}" alt=""><button type="button" data-x="${i}" aria-label="Remove photo">×</button></span>`).join("")};
+$("#thumbs").onclick=e=>{const b=e.target.closest("button");if(b){pics.splice(+b.dataset.x,1);drawThumbs()}};
+const shrink=f=>new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{
+  const w=Math.min(640,im.width),h=im.height*w/im.width,c=document.createElement("canvas");
+  c.width=w;c.height=h;const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);
+  res(c.toDataURL("image/jpeg",.7))};im.src=r.result};r.readAsDataURL(f)});
+$("#ph").onchange=async e=>{
+  for(const f of e.target.files){if(pics.length>=2){$("#msg").textContent="You can add up to 2 photos.";break}pics.push(await shrink(f))}
+  e.target.value="";drawThumbs();
+};
 const when=t=>t?new Date(t).toLocaleDateString("en-IN",{month:"short",year:"numeric"}):"";
 
 async function load(){
@@ -152,7 +173,7 @@ async function load(){
     $("#avg").textContent=avg.toFixed(1);$("#avgst").innerHTML=stars(Math.round(avg));
     $("#cnt").textContent=`Based on ${r.length} review${r.length>1?"s":""}`;
     $("#bars").innerHTML=[5,4,3,2,1].map(n=>{const c=r.filter(x=>x.rating==n).length;return `<div><span>${n}★</span><i><u style="width:${c/r.length*100}%"></u></i><span>${c}</span></div>`}).join("");
-    $("#list").innerHTML=r.map(x=>`<article class="rv">${stars(x.rating)}<p>${esc(x.text)}</p><small><b>${esc(x.name)}</b>${x.city?", "+esc(x.city):""}${x.product?" · "+esc(x.product):""}${x.created?" · "+when(x.created):""}</small></article>`).join("");
+    $("#list").innerHTML=r.map(x=>`<article class="rv">${stars(x.rating)}<p>${esc(x.text)}</p>${photosHtml(x)}<small><b>${esc(x.name)}</b>${x.city?", "+esc(x.city):""}${x.product?" · "+esc(x.product):""}${x.created?" · "+when(x.created):""}</small></article>`).join("");
   }catch(e){$("#cnt").textContent="Reviews will appear here soon";$("#list").innerHTML=""}
 }
 load();
@@ -167,9 +188,9 @@ $("#f").onsubmit=async e=>{
   if(Date.now()-last<60000){m.textContent="Please wait a minute before sending another review.";return}
   const b=$("#go");b.disabled=true;m.textContent="Sending…";
   try{
-    await addDoc(col,{name:$("#nm").value.trim(),city:$("#ct").value.trim(),product:$("#pr").value.trim(),rating,text:$("#tx").value.trim(),approved:false,created:Date.now()});
+    await addDoc(col,{name:$("#nm").value.trim(),city:$("#ct").value.trim(),product:$("#pr").value.trim(),rating,text:$("#tx").value.trim(),approved:false,created:Date.now(),...(pics.length?{imgs:pics}:{})});
     try{localStorage.setItem("av_rv",Date.now())}catch(_){}
-    $("#f").reset();rating=0;document.querySelectorAll("#rate button").forEach(x=>x.classList.remove("on"));
+    $("#f").reset();rating=0;pics=[];drawThumbs();document.querySelectorAll("#rate button").forEach(x=>x.classList.remove("on"));
     m.textContent="Thank you! Your review will appear on this page once we approve it.";
   }catch(x){m.textContent="Sorry, we could not send your review. Please try again or message us on WhatsApp."}
   b.disabled=false;
